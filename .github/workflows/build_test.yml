@@ -28,3 +28,13 @@ jobs:
 
     - name: Run build_test.sh
       run: bash .github/workflows/build_test.sh
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-output
+        path: |
+          *.bin
+          *.img
+          *.elf
+          build/**
+          out/**
