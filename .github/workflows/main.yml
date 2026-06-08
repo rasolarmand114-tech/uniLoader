@@ -1,47 +1,40 @@
-name: Build uniLoader A12S
+name: Build all devices
 
 on:
-  workflow_dispatch:
   push:
+    branches: [ "master" ]
   pull_request:
+    branches: [ "master" ]
 
 jobs:
   build:
+
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout source
-      uses: actions/checkout@v4
+    - uses: actions/checkout@v5
 
-    - name: Install dependencies
-      run: |
-        sudo apt update
-        sudo apt install -y \
-          gcc-aarch64-linux-gnu \
-          binutils-aarch64-linux-gnu \
-          make \
-          bc \
-          bison \
-          flex \
-          libssl-dev
+    - name: Install build dependencies
+      run: sudo apt install -y bash build-essential gcc-arm-linux-gnueabihf gcc-aarch64-linux-gnu
 
-    - name: Configure
-      run: |
-        make ARCH=arm64 \
-          CROSS_COMPILE=aarch64-linux-gnu- \
-          a12s_defconfig
+    - name: Create dummy kernel blob
+      run: dd if=/dev/zero of=blob/Image bs=1M count=1
 
-    - name: Build
-      run: |
-        make -j$(nproc) \
-          CROSS_COMPILE=aarch64-linux-gnu-
+    - name: Create dummy ramdisk blob
+      run: dd if=/dev/zero of=blob/ramdisk bs=1M count=1
 
+    - name: Create dummy device tree blob
+      run: dd if=/dev/zero of=blob/dtb bs=1M count=1
+
+    - name: Run build_test.sh
+      run: bash .github/workflows/build_test.sh
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: uniLoader-a12s
+        name: build-output
         path: |
-          build/**
-          out/**
           *.bin
           *.img
+          *.elf
+          build/**
+          out/**
