@@ -12,17 +12,8 @@ makeargs="CROSS_COMPILE=aarch64-linux-gnu- -j$procs"
 
 echo "Using $procs cores for build."
 
-# Get all available device codenames
-for config in configs/*; do
-    split=(${config//[\/_]/ })
-    devices+=("${split[1]}")
-done
+make distclean $makeargs
+make a12s_defconfig $makeargs
+make $makeargs
 
-# And... build.
-for device in "${devices[@]}"; do
-    make distclean $makeargs
-    make "${device}_defconfig" $makeargs
-    make $makeargs
-done
-
-echo "All done, glhf!"
+echo "A12S build completed."
