@@ -1,0 +1,48 @@
+name: Build uniLoader A12S
+
+on:
+  workflow_dispatch:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout source
+      uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: |
+        sudo apt update
+        sudo apt install -y \
+          gcc-aarch64-linux-gnu \
+          binutils-aarch64-linux-gnu \
+          make \
+          bc \
+          bison \
+          flex \
+          libssl-dev
+
+    - name: Configure
+      run: |
+        make ARCH=arm64 \
+          CROSS_COMPILE=aarch64-linux-gnu- \
+          a12s_defconfig
+
+    - name: Build
+      run: |
+        make -j$(nproc) \
+          ARCH=arm64 \
+          CROSS_COMPILE=aarch64-linux-gnu-
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: uniLoader-a12s
+        path: |
+          build/**
+          out/**
+          *.bin
+          *.img
