@@ -11,7 +11,7 @@ procs=$(nproc --all)
 makeargs="CROSS_COMPILE=aarch64-linux-gnu- -j$procs"
 
 echo "Using $procs cores for build."
-
+make ARCH=arm64
 make distclean $makeargs
 make a12s_defconfig $makeargs
 make $makeargs
